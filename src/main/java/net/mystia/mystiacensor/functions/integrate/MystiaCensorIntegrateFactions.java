@@ -1,19 +1,16 @@
 package net.mystia.mystiacensor.functions.integrate;
 
-import java.util.Set;
-
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import com.massivecraft.factions.FPlayer;
 import com.massivecraft.factions.FPlayers;
 
-import net.mystia.mystiacensor.functions.MystiaCensorAPI;
 
 public class MystiaCensorIntegrateFactions
 {
 
-	private MystiaCensorAPI api;
+
 	/**
 	 * Gets name of faction player is in
 	 * @param player
@@ -86,26 +83,26 @@ public class MystiaCensorIntegrateFactions
 	}
 
 
-	public String getFactionsParsedChatString(String parsedChatString, Player from, Player to)
+	public String parseFactionsChatString(String parsedChatString, Player fromPlayer, Player toPlayer)
 	{
 		// Left padding
-		parsedChatString = parsedChatString.replace("[factions_title_pl]", " " + getFactionTitle(from));
-		parsedChatString = parsedChatString.replace("[factions_relcolor_pl]", " " + getFactionRelationToColor(from, to).toString());
-		parsedChatString = parsedChatString.replace("[factions_tag_pl]", " " + getFactionName(from));
-		parsedChatString = parsedChatString.replace("[factions_tagforce_pl]", " " + getFactionName(from, true));
-		parsedChatString = parsedChatString.replace("[factions_roleprefix_pl]", " " + getFactionRolePrefix(from));
+		parsedChatString = parsedChatString.replace("[factions_title_pl]", " " + getFactionTitle(fromPlayer));
+		parsedChatString = parsedChatString.replace("[factions_relcolor_pl]", " " + getFactionRelationToColor(fromPlayer, toPlayer).toString());
+		parsedChatString = parsedChatString.replace("[factions_tag_pl]", " " + getFactionName(fromPlayer));
+		parsedChatString = parsedChatString.replace("[factions_tagforce_pl]", " " + getFactionName(fromPlayer, true));
+		parsedChatString = parsedChatString.replace("[factions_roleprefix_pl]", " " + getFactionRolePrefix(fromPlayer));
 		// Right padding
-		parsedChatString = parsedChatString.replace("[factions_title_pr]", getFactionTitle(from) + " ");
-		parsedChatString = parsedChatString.replace("[factions_relcolor_pr]", getFactionRelationToColor(from, to).toString() + " ");
-		parsedChatString = parsedChatString.replace("[factions_tag_pr]", getFactionName(from) + " ");
-		parsedChatString = parsedChatString.replace("[factions_tagforce_pr]", getFactionName(from, true) + " ");
-		parsedChatString = parsedChatString.replace("[factions_roleprefix_pr]", getFactionRolePrefix(from) + " ");
+		parsedChatString = parsedChatString.replace("[factions_title_pr]", getFactionTitle(fromPlayer) + " ");
+		parsedChatString = parsedChatString.replace("[factions_relcolor_pr]", getFactionRelationToColor(fromPlayer, toPlayer).toString() + " ");
+		parsedChatString = parsedChatString.replace("[factions_tag_pr]", getFactionName(fromPlayer) + " ");
+		parsedChatString = parsedChatString.replace("[factions_tagforce_pr]", getFactionName(fromPlayer, true) + " ");
+		parsedChatString = parsedChatString.replace("[factions_roleprefix_pr]", getFactionRolePrefix(fromPlayer) + " ");
 		// No padding
-		parsedChatString = parsedChatString.replace("[factions_title]", getFactionTitle(from));
-		parsedChatString = parsedChatString.replace("[factions_relcolor]", getFactionRelationToColor(from, to).toString());
-		parsedChatString = parsedChatString.replace("[factions_tag]", getFactionName(from));
-		parsedChatString = parsedChatString.replace("[factions_tagforce]", getFactionName(from, true));
-		parsedChatString = parsedChatString.replace("[factions_roleprefix]", getFactionRolePrefix(from));
+		parsedChatString = parsedChatString.replace("[factions_title]", getFactionTitle(fromPlayer));
+		parsedChatString = parsedChatString.replace("[factions_relcolor]", getFactionRelationToColor(fromPlayer, toPlayer).toString());
+		parsedChatString = parsedChatString.replace("[factions_tag]", getFactionName(fromPlayer));
+		parsedChatString = parsedChatString.replace("[factions_tagforce]", getFactionName(fromPlayer, true));
+		parsedChatString = parsedChatString.replace("[factions_roleprefix]", getFactionRolePrefix(fromPlayer));
 
 		return parsedChatString;
 	}

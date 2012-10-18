@@ -34,16 +34,29 @@ public class MystiaCensorListener implements Listener
 		AsyncPlayerChatEvent monitorOnlyEvent = new AsyncPlayerChatEvent(false, player, originalMessage, new HashSet<Player>(Arrays.asList(Bukkit
 			.getOnlinePlayers())));
 		// Here we set the format
-		monitorOnlyEvent.setFormat(api.getParsedChatString(originalMessage, player));
+		monitorOnlyEvent.setFormat(api.parseChatString(originalMessage, player));
 		MystiaCensorExternalFunctions.callEventAtMonitorOnly(monitorOnlyEvent);
 		// Again, as how factions implements this, we log in console manually
 		Bukkit.getConsoleSender().sendMessage(
 			String.format(monitorOnlyEvent.getFormat(), monitorOnlyEvent.getPlayer().getDisplayName(), monitorOnlyEvent.getMessage()));
 
+
+		
 		/*
 		 * If we do not need to integrate with anything, send the message as
-		 * formatted, while considering players that have censored
+		 * formatted, while considering players that have censored.
+		 * 
+		 * If we need to integrate with mcMMO, we will check if the player is in a party or admin chat
+		 * and will not send the message
+		 * 
+		 * If we need to integrate with Factions, we will parse the factions tags with parseFactionsChatString()
+		 * 
+		 * To prevent code duplication, we pass on the formatted chat string on method call
+		 * rather than format the chat string in the method itself
+		 * 
+		 * Because we need to fire the Chat event properly, we must pass on to the method our Bukkit event parameters
 		 */
-		api.sendFormattedMessage(event.getRecipients(), originalMessage, censoredMessage, player);
+		
+		api.sendMessage(event.getRecipients(),api.parseChatString(originalMessage,player), api.parseChatString(censoredMessage, player), censoredMessage, originalMessage, player);
 	}
 }

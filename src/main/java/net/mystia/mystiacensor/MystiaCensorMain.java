@@ -3,13 +3,12 @@ package net.mystia.mystiacensor;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import net.mystia.mystiacensor.functions.MystiaCensorAPI;
+
 import net.mystia.mystiacensor.functions.MystiaCensorExternalFunctions;
 
 public class MystiaCensorMain extends JavaPlugin
 {
 	private MystiaCensorExternalFunctions functions;
-	private MystiaCensorAPI api;
 	public void onEnable()
 	{
 

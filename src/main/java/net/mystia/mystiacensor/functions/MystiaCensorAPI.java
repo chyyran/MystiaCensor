@@ -5,8 +5,10 @@ import java.util.List;
 import java.util.Set;
 
 import net.mystia.mystiacensor.MystiaCensorMain;
+import net.mystia.mystiacensor.event.MystiaCensorChatEvent;
 import net.mystia.mystiacensor.functions.MystiaCensorExternalFunctions;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
@@ -14,7 +16,7 @@ import org.bukkit.entity.Player;
  * MystiaCensor API
  * 
  * @author ron975
- *
+ * 
  */
 public class MystiaCensorAPI
 {
@@ -77,7 +79,7 @@ public class MystiaCensorAPI
 	}
 
 	/**
-	 * Here we parse the format string
+	 * Parse the chat string and replace with appropriate tags
 	 * 
 	 * @param message
 	 *            Message
@@ -85,7 +87,7 @@ public class MystiaCensorAPI
 	 *            Sender
 	 * @return Formatted chat message
 	 */
-	public String getParsedChatString(String message, Player fromPlayer)
+	public String parseChatString(String message, Player fromPlayer)
 	{
 		String parsedChat = this.getFormat();
 		parsedChat = parsedChat.replace("+message", message);
@@ -124,28 +126,52 @@ public class MystiaCensorAPI
 
 	}
 
-/**
- * Sends a censored message
- * @param messageRecipients Players who will receive the message
- * @param originalMessage Original, uncensored formatted message 
- * @param censoredMessage Censored formatted message 
- * @param fromPlayer Player that originally send the message
- * @see net.mystia.mystiacensor.functions.MystiaCensorAPI#getParsedChatString(String message, Player fromPlayer)
- */
+	/**
+	 * Sends a censored message
+	 * 
+	 * @param messageRecipients
+	 *            Players who will receive the message
+	 * @param originalMessage
+	 *            Original, uncensored formatted message
+	 * @param censoredMessage
+	 *            Censored formatted message
+	 * @see net.mystia.mystiacensor.functions.MystiaCensorAPI#parseChatString(String
+	 *      message, Player fromPlayer)
+	 * @see net.mystia.mystiacensor.functions.integrate#parseFactionsChatString(String
+	 *      message, Player fromPlayer)
+	 */
 
-	public void sendFormattedMessage(Set<Player> messageRecipients, String originalMessage, String censoredMessage, Player fromPlayer)
+	public void sendMessage(Set<Player> messageRecipients, String originalMessageFormatted, String censoredMessageFormatted, String originalMessage,
+		String censoredMessage, Player fromPlayer)
 	{
-		for (Player toPlayer : messageRecipients)
-		{
-			if (toPlayer.hasPermission("mystia.censor"))
-			{
 
-				toPlayer.sendMessage(getParsedChatString(censoredMessage, fromPlayer));
-			}
-			else
+		/*
+		 * Before we do anything, we fire the event appropriately so others may
+		 * be able to modify it
+		 */
+		MystiaCensorChatEvent event = new MystiaCensorChatEvent(messageRecipients, originalMessageFormatted, censoredMessageFormatted,
+			originalMessage, censoredMessage, fromPlayer);
+		Bukkit.getServer().getPluginManager().callEvent(event);
+
+		/*
+		 * Now, instead of using the supplied variables, we use the ones from the event.
+		 */
+		if (!event.isCancelled())
+		{
+			for (Player toPlayer : event.getRecipients())
 			{
-				toPlayer.sendMessage(getParsedChatString(originalMessage, fromPlayer));
+				if (toPlayer.hasPermission("mystia.censor"))
+				{
+
+					toPlayer.sendMessage(event.getFormattedCensoredMessage());
+				}
+				else
+				{
+					toPlayer.sendMessage(event.getFormattedOriginalMessage());
+				}
 			}
+		}else{
+			return;
 		}
 	}
 
