@@ -16,15 +16,12 @@ import net.mystia.mystiacensor.functions.MystiaCensorExternalFunctions;
 public class MystiaCensorListener implements Listener
 {
 
-	private MystiaCensorAPI api;
-
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerChat(AsyncPlayerChatEvent event)
 	{
 		Player player = event.getPlayer();
 		String originalMessage = event.getMessage();
-		String censoredMessage = event.getMessage();
-		censoredMessage = api.getCensoredMessage(originalMessage);
+		String censoredMessage = MystiaCensorAPI.getCensoredMessage(originalMessage);
 
 		/*
 		 * As how Factions does it, we cancel the existing event and call a new
@@ -34,12 +31,15 @@ public class MystiaCensorListener implements Listener
 		AsyncPlayerChatEvent monitorOnlyEvent = new AsyncPlayerChatEvent(false, player, originalMessage, new HashSet<Player>(Arrays.asList(Bukkit
 			.getOnlinePlayers())));
 		// Here we set the format
-		monitorOnlyEvent.setFormat(api.parseChatString(originalMessage, player));
+		monitorOnlyEvent.setFormat(MystiaCensorAPI.parseMessage(originalMessage, MystiaCensorAPI.parseChatTags(player)));
 		MystiaCensorExternalFunctions.callEventAtMonitorOnly(monitorOnlyEvent);
-		// Again, as how factions implements this, we log in console manually
-		Bukkit.getConsoleSender().sendMessage(
-			String.format(monitorOnlyEvent.getFormat(), monitorOnlyEvent.getPlayer().getDisplayName(), monitorOnlyEvent.getMessage()));
-
+		/*
+		 *  Again, as how factions implements this, we log in console manually.
+		 *  Since we're no longer using the String.format method, and getFormat() will return the whole
+		 *  chat string to be sent, we have no need to send anything more than that.
+		 */
+		Bukkit.getConsoleSender().sendMessage(monitorOnlyEvent.getFormat());
+			
 
 		
 		/*
@@ -57,6 +57,7 @@ public class MystiaCensorListener implements Listener
 		 * Because we need to fire the Chat event properly, we must pass on to the method our Bukkit event parameters
 		 */
 		
-		api.sendMessage(event.getRecipients(),api.parseChatString(originalMessage,player), api.parseChatString(censoredMessage, player), censoredMessage, originalMessage, player);
+		
+		MystiaCensorAPI.sendMessage(event.getRecipients(),originalMessage, censoredMessage, MystiaCensorAPI.parseChatTags(player) ,player);
 	}
 }

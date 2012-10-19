@@ -21,34 +21,20 @@ public class MystiaCensorChatEvent extends Event implements Cancellable
 	private Player player;
 	private Boolean cancel = false;
 	private Set<Player> recipients;
-	private String formattedCensoredMessage;
-	private String formattedOriginalMessage;
+	private String formatTags = MystiaCensorAPI.getFormat();
 	private String originalMessage;
 	private String censoredMessage;
 	private static final HandlerList handlers = new HandlerList();
-	private MystiaCensorAPI api;
 	
-	
-	public MystiaCensorChatEvent(Set<Player> messageRecipients, String originalMessage, String censoredMessage, Player fromPlayer)
+	public MystiaCensorChatEvent(Set<Player> messageRecipients, String originalMessage, String censoredMessage,String formatTags, Player fromPlayer)
 	{
 		this.player = fromPlayer;
 		this.recipients = messageRecipients;
-		this.formattedOriginalMessage = api.parseChatString(originalMessage, fromPlayer);
-		this.formattedCensoredMessage = api.parseChatString(censoredMessage,fromPlayer);
 		this.originalMessage = originalMessage;
 		this.censoredMessage = censoredMessage;
+		this.formatTags = formatTags;
 	}
 
-	public MystiaCensorChatEvent(Set<Player> messageRecipients, String originalMessageFormatted, String censoredMessageFormatted,
-		String originalMessage, String censoredMessage, Player fromPlayer)
-	{
-		this.player = fromPlayer;
-		this.recipients = messageRecipients;
-		this.formattedOriginalMessage = originalMessageFormatted;
-		this.formattedCensoredMessage = censoredMessageFormatted;
-		this.originalMessage = originalMessage;
-		this.censoredMessage = censoredMessage;
-	}
 
 	public Player getPlayer()
 	{
@@ -65,14 +51,18 @@ public class MystiaCensorChatEvent extends Event implements Cancellable
 		return originalMessage;
 	}
 
-	public String getFormattedCensoredMessage()
+	/**
+	 * This gets the format for the event.
+	 * <br/>
+	 * <b>Warning:</b> This does not return a valid string to be formatted with String.format
+	 * <br />To return a full message, you must use MystiaCensorAPI.parseMessages()
+	 * <br />For example, {@code MystiaCensorAPI.parseMessage(message, getFormat());}
+	 * @return Format string with "+message" where message is to be replaced
+	 * @see net.mystia.mystiacensor.functions.MystiaCensorAPI#parseMessage(String, String)
+	 */
+	public String getFormat()
 	{
-		return formattedCensoredMessage;
-	}
-
-	public String getFormattedOriginalMessage()
-	{
-		return formattedOriginalMessage;
+		return formatTags;
 	}
 
 	public Set<Player> getRecipients()

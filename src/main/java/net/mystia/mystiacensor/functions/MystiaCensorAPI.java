@@ -21,14 +21,14 @@ import org.bukkit.entity.Player;
 public class MystiaCensorAPI
 {
 
-	private MystiaCensorMain plugin;
+	private static MystiaCensorMain plugin;
 
 	/**
 	 * Get profanities from config
 	 * 
 	 * @return List of profanities as defined in config
 	 */
-	public List<String> getProfanities()
+	public static List<String> getProfanities()
 	{
 		Set<String> profanitySet = plugin.getConfig().getConfigurationSection("censors").getKeys(false);
 		List<String> profanityList = new ArrayList<String>(profanitySet);
@@ -42,12 +42,12 @@ public class MystiaCensorAPI
 	 *            Original, uncensored message
 	 * @return Censored message
 	 */
-	public String getCensoredMessage(String originalMessage)
+	public static String getCensoredMessage(String originalMessage)
 	{
 		String censorMessage = null;
-		for (String s : this.getProfanities())
+		for (String s : getProfanities())
 		{
-			censorMessage = censorMessage.replaceAll(s, this.getCensoredWord(s));
+			censorMessage = censorMessage.replaceAll(s, getCensoredWord(s));
 		}
 
 		return censorMessage;
@@ -61,7 +61,7 @@ public class MystiaCensorAPI
 	 *            Original, uncensored word
 	 * @return Censored word
 	 */
-	public String getCensoredWord(String originalWord)
+	public static String getCensoredWord(String originalWord)
 	{
 		String censoredWord = plugin.getConfig().getString("censor." + originalWord);
 		return censoredWord;
@@ -72,7 +72,7 @@ public class MystiaCensorAPI
 	 * 
 	 * @return Format String
 	 */
-	public String getFormat()
+	public static String getFormat()
 	{
 		String getFormat = plugin.getConfig().getString("formatting.format");
 		return getFormat;
@@ -87,26 +87,29 @@ public class MystiaCensorAPI
 	 *            Sender
 	 * @return Formatted chat message
 	 */
-	public String parseChatString(String message, Player fromPlayer)
+	public static String parseChatTags(String formatTags, Player fromPlayer)
 	{
-		String parsedChat = this.getFormat();
-		parsedChat = parsedChat.replace("+message", message);
-		parsedChat = parsedChat.replace("+displayname", fromPlayer.getDisplayName());
-		parsedChat = parsedChat.replace("+name", fromPlayer.getName());
-		parsedChat = parsedChat.replace("+world", fromPlayer.getWorld().getName());
-		parsedChat = parsedChat.replace("+level", Integer.toString(fromPlayer.getExpToLevel()));
-		parsedChat = parsedChat.replace("+health", Integer.toString(fromPlayer.getHealth()));
+		formatTags = ChatColor.translateAlternateColorCodes('&', formatTags);
+		/*
+		 * Rather than insert the message here, do that with parseMessage
+		 * formatTags = formatTags.replace("+message", ChatColor.translateAlternateColorCodes('&', message));
+		 */
+		formatTags = formatTags.replace("+displayname", fromPlayer.getDisplayName());
+		formatTags = formatTags.replace("+name", fromPlayer.getName());
+		formatTags = formatTags.replace("+world", fromPlayer.getWorld().getName());
+		formatTags = formatTags.replace("+level", Integer.toString(fromPlayer.getExpToLevel()));
+		formatTags = formatTags.replace("+health", Integer.toString(fromPlayer.getHealth()));
 		if (MystiaCensorExternalFunctions.permission.isEnabled())
 		{
 
-			parsedChat = parsedChat.replace("+group", MystiaCensorExternalFunctions.permission.getPrimaryGroup(fromPlayer));
+			formatTags = formatTags.replace("+group", MystiaCensorExternalFunctions.permission.getPrimaryGroup(fromPlayer));
 			if (MystiaCensorExternalFunctions.chat.isEnabled())
 			{
-				parsedChat = parsedChat.replace(
+				formatTags = formatTags.replace(
 					"+groupprefix",
 					MystiaCensorExternalFunctions.chat.getGroupPrefix(fromPlayer.getWorld(),
 						MystiaCensorExternalFunctions.permission.getPrimaryGroup(fromPlayer)));
-				parsedChat = parsedChat.replace(
+				formatTags = formatTags.replace(
 					"+groupsuffix",
 					MystiaCensorExternalFunctions.chat.getGroupSuffix(fromPlayer.getWorld(),
 						MystiaCensorExternalFunctions.permission.getPrimaryGroup(fromPlayer)));
@@ -114,43 +117,66 @@ public class MystiaCensorAPI
 		}
 		if (MystiaCensorExternalFunctions.economy.isEnabled())
 		{
-			parsedChat = parsedChat.replace("+moneyintrounddown",
+			formatTags = formatTags.replace("+moneyintrounddown",
 				Integer.toString((int) MystiaCensorExternalFunctions.economy.getBalance(fromPlayer.getName())));
-			parsedChat = parsedChat.replace("+moneyintroundup",
+			formatTags = formatTags.replace("+moneyintroundup",
 				Integer.toString((int) Math.round(MystiaCensorExternalFunctions.economy.getBalance(fromPlayer.getName()))));
-			parsedChat = parsedChat.replace("+money", Double.toString((MystiaCensorExternalFunctions.economy.getBalance(fromPlayer.getName()))));
+			formatTags = formatTags.replace("+money", Double.toString((MystiaCensorExternalFunctions.economy.getBalance(fromPlayer.getName()))));
 		}
-
-		parsedChat = ChatColor.translateAlternateColorCodes('&', parsedChat);
-		return parsedChat;
+		
+		
+		return formatTags;
 
 	}
+	
+	public static String parseChatTags(Player fromPlayer){
+		return parseChatTags(getFormat(), fromPlayer);
+	}
+
+	
+	/**
+	 * Used to insert a message into formatted chat tags
+	 * @param message Message to be inserted
+	 * @param format Formatted chat tags
+	 * @return Formatted chat tags with message inserted
+	 */
+	public static String parseMessage(String message, String format){
+		message = message.replace("+message",message);
+		return message;
+	}
+	
 
 	/**
 	 * Sends a censored message
 	 * 
+	 * While it is possible to send completely different formatted messages, this is strongly discouraged.
 	 * @param messageRecipients
 	 *            Players who will receive the message
 	 * @param originalMessage
-	 *            Original, uncensored formatted message
+	 *            Original, uncensored unformatted message for API purposes
 	 * @param censoredMessage
-	 *            Censored formatted message
+	 *            Censored unformatted message for API purposes
+	 * @param originalFormattedMessage
+	 *            Original, uncensored formatted message. This one will be sent to the player
+	 * @param censoredFormattedMessage
+	 *            Censored formatted message. This one will be sent to the player
+	 *        
 	 * @see net.mystia.mystiacensor.functions.MystiaCensorAPI#parseChatString(String
 	 *      message, Player fromPlayer)
 	 * @see net.mystia.mystiacensor.functions.integrate#parseFactionsChatString(String
 	 *      message, Player fromPlayer)
 	 */
 
-	public void sendMessage(Set<Player> messageRecipients, String originalMessageFormatted, String censoredMessageFormatted, String originalMessage,
-		String censoredMessage, Player fromPlayer)
+	public static void sendMessage(Set<Player> messageRecipients, String originalMessage,
+		String censoredMessage, String formatTags ,Player fromPlayer)
 	{
 
 		/*
 		 * Before we do anything, we fire the event appropriately so others may
 		 * be able to modify it
 		 */
-		MystiaCensorChatEvent event = new MystiaCensorChatEvent(messageRecipients, originalMessageFormatted, censoredMessageFormatted,
-			originalMessage, censoredMessage, fromPlayer);
+		MystiaCensorChatEvent event = new MystiaCensorChatEvent(messageRecipients,
+			originalMessage, censoredMessage,formatTags, fromPlayer);
 		Bukkit.getServer().getPluginManager().callEvent(event);
 
 		/*
@@ -163,16 +189,19 @@ public class MystiaCensorAPI
 				if (toPlayer.hasPermission("mystia.censor"))
 				{
 
-					toPlayer.sendMessage(event.getFormattedCensoredMessage());
+					toPlayer.sendMessage(parseMessage(formatTags,censoredMessage));
 				}
 				else
 				{
-					toPlayer.sendMessage(event.getFormattedOriginalMessage());
+					toPlayer.sendMessage(parseMessage(formatTags,originalMessage));
 				}
 			}
 		}else{
 			return;
 		}
 	}
-
+	
+	
+	
+	
 }
