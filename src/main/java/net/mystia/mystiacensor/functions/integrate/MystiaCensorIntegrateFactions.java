@@ -16,7 +16,7 @@ public class MystiaCensorIntegrateFactions
 	 * @param player
 	 * @return Faction Name
 	 */
-	public String getFactionName(Player player)
+	public static String getFactionName(Player player)
 	{
 		return getFactionName(player, false);
 	}
@@ -26,7 +26,7 @@ public class MystiaCensorIntegrateFactions
 	 * @param isForced Are we forcing Factions to return a name?
 	 * @return Faction Name
 	 */
-	public String getFactionName(Player player, Boolean isForced)
+	public static String getFactionName(Player player, Boolean isForced)
 	{
 		FPlayer fplayer = FPlayers.i.get(player);
 		if (isForced)
@@ -52,7 +52,7 @@ public class MystiaCensorIntegrateFactions
 	 * @param toPlayer Relation colour of fromPlayer
 	 * @return Relation color of fromPlayer's faction to toPlayer's faction
 	 */
-	public ChatColor getFactionRelationToColor(Player fromPlayer, Player toPlayer)
+	public static ChatColor getFactionRelationToColor(Player fromPlayer, Player toPlayer)
 	{
 		FPlayer fromFPlayer = FPlayers.i.get(fromPlayer);
 		FPlayer toFPlayer = FPlayers.i.get(toPlayer);
@@ -64,7 +64,7 @@ public class MystiaCensorIntegrateFactions
 	 * @param player Player we want to get the title from
 	 * @return Faction title
 	 */
-	public String getFactionTitle(Player player)
+	public static String getFactionTitle(Player player)
 	{
 		FPlayer fplayer = FPlayers.i.get(player);
 		return fplayer.getTitle();
@@ -75,7 +75,7 @@ public class MystiaCensorIntegrateFactions
 	 * @param player Player we want to get the roleprefix from
 	 * @return Role prefix
 	 */
-	public String getFactionRolePrefix(Player player)
+	public static String getFactionRolePrefix(Player player)
 	{
 		FPlayer fplayer = FPlayers.i.get(player);
 		return fplayer.getRole().getPrefix();
@@ -83,28 +83,31 @@ public class MystiaCensorIntegrateFactions
 	}
 
 
-	public String parseFactionsChatString(String parsedChatString, Player fromPlayer, Player toPlayer)
+	public static String parseFactionsChatTags(String formatTags, Player fromPlayer, Player toPlayer)
 	{
 		// Left padding
-		parsedChatString = parsedChatString.replace("[factions_title_pl]", " " + getFactionTitle(fromPlayer));
-		parsedChatString = parsedChatString.replace("[factions_relcolor_pl]", " " + getFactionRelationToColor(fromPlayer, toPlayer).toString());
-		parsedChatString = parsedChatString.replace("[factions_tag_pl]", " " + getFactionName(fromPlayer));
-		parsedChatString = parsedChatString.replace("[factions_tagforce_pl]", " " + getFactionName(fromPlayer, true));
-		parsedChatString = parsedChatString.replace("[factions_roleprefix_pl]", " " + getFactionRolePrefix(fromPlayer));
+		formatTags = formatTags.replace("[factions_title_pl]", " " + getFactionTitle(fromPlayer));
+		formatTags = formatTags.replace("[factions_relcolor_pl]", " " + getFactionRelationToColor(fromPlayer, toPlayer).toString());
+		formatTags = formatTags.replace("[factions_tag_pl]", " " + getFactionName(fromPlayer));
+		formatTags = formatTags.replace("[factions_tagforce_pl]", " " + getFactionName(fromPlayer, true));
+		formatTags = formatTags.replace("[factions_roleprefix_pl]", " " + getFactionRolePrefix(fromPlayer));
 		// Right padding
-		parsedChatString = parsedChatString.replace("[factions_title_pr]", getFactionTitle(fromPlayer) + " ");
-		parsedChatString = parsedChatString.replace("[factions_relcolor_pr]", getFactionRelationToColor(fromPlayer, toPlayer).toString() + " ");
-		parsedChatString = parsedChatString.replace("[factions_tag_pr]", getFactionName(fromPlayer) + " ");
-		parsedChatString = parsedChatString.replace("[factions_tagforce_pr]", getFactionName(fromPlayer, true) + " ");
-		parsedChatString = parsedChatString.replace("[factions_roleprefix_pr]", getFactionRolePrefix(fromPlayer) + " ");
+		formatTags = formatTags.replace("[factions_title_pr]", getFactionTitle(fromPlayer) + " ");
+		formatTags = formatTags.replace("[factions_relcolor_pr]", getFactionRelationToColor(fromPlayer, toPlayer).toString() + " ");
+		formatTags = formatTags.replace("[factions_tag_pr]", getFactionName(fromPlayer) + " ");
+		formatTags = formatTags.replace("[factions_tagforce_pr]", getFactionName(fromPlayer, true) + " ");
+		formatTags = formatTags.replace("[factions_roleprefix_pr]", getFactionRolePrefix(fromPlayer) + " ");
 		// No padding
-		parsedChatString = parsedChatString.replace("[factions_title]", getFactionTitle(fromPlayer));
-		parsedChatString = parsedChatString.replace("[factions_relcolor]", getFactionRelationToColor(fromPlayer, toPlayer).toString());
-		parsedChatString = parsedChatString.replace("[factions_tag]", getFactionName(fromPlayer));
-		parsedChatString = parsedChatString.replace("[factions_tagforce]", getFactionName(fromPlayer, true));
-		parsedChatString = parsedChatString.replace("[factions_roleprefix]", getFactionRolePrefix(fromPlayer));
+		formatTags = formatTags.replace("[factions_title]", getFactionTitle(fromPlayer));
+		formatTags = formatTags.replace("[factions_relcolor]", getFactionRelationToColor(fromPlayer, toPlayer).toString());
+		formatTags = formatTags.replace("[factions_tag]", getFactionName(fromPlayer));
+		formatTags = formatTags.replace("[factions_tagforce]", getFactionName(fromPlayer, true));
+		formatTags = formatTags.replace("[factions_roleprefix]", getFactionRolePrefix(fromPlayer));
 
-		return parsedChatString;
+		return formatTags;
 	}
 
+
+
+	
 }

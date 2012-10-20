@@ -17,7 +17,7 @@ import org.bukkit.event.HandlerList;
  */
 public class MystiaCensorChatEvent extends Event implements Cancellable
 {
-
+	private Boolean isUsingFactions = false;
 	private Player player;
 	private Boolean cancel = false;
 	private Set<Player> recipients;
@@ -36,6 +36,9 @@ public class MystiaCensorChatEvent extends Event implements Cancellable
 	}
 
 
+	public void setFactionsStatus(Boolean status){
+		this.isUsingFactions = status;
+	}
 	public Player getPlayer()
 	{
 		return player;

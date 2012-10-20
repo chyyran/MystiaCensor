@@ -10,8 +10,12 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
+import com.gmail.nossr50.datatypes.PlayerProfile;
+import com.gmail.nossr50.util.Users;
+
 import net.mystia.mystiacensor.functions.MystiaCensorAPI;
 import net.mystia.mystiacensor.functions.MystiaCensorExternalFunctions;
+import net.mystia.mystiacensor.functions.integrate.MystiaCensorIntegrateFunctions;
 
 public class MystiaCensorListener implements Listener
 {
@@ -49,15 +53,26 @@ public class MystiaCensorListener implements Listener
 		 * If we need to integrate with mcMMO, we will check if the player is in a party or admin chat
 		 * and will not send the message
 		 * 
-		 * If we need to integrate with Factions, we will parse the factions tags with parseFactionsChatString()
+		 * If we need to integrate with Factions, we will parse the factions tags with parseFactionsChatTags()
+		 * at sendMessage(), as it parseFactionsChatTags() needs a recipient.
 		 * 
-		 * To prevent code duplication, we pass on the formatted chat string on method call
+		 * 
+		 * To prevent duplication, we pass on the formatted chat string on method call
 		 * rather than format the chat string in the method itself
 		 * 
 		 * Because we need to fire the Chat event properly, we must pass on to the method our Bukkit event parameters
 		 */
 		
 		
+		if(MystiaCensorIntegrateFunctions.isUsingMcMMO()){
+			//Get the mcMMO profile for the player
+			PlayerProfile profile = Users.getProfile(player);
+			//If the player is in party chat or admin chat mode, we don't do anything.
+			if(profile.getPartyChatMode()||profile.getAdminChatMode()){
+				return;
+			}
+		}
+
 		MystiaCensorAPI.sendMessage(event.getRecipients(),originalMessage, censoredMessage, MystiaCensorAPI.parseChatTags(player) ,player);
 	}
 }

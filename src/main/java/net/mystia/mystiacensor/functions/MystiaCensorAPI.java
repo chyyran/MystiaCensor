@@ -7,7 +7,6 @@ import java.util.Set;
 import net.mystia.mystiacensor.MystiaCensorMain;
 import net.mystia.mystiacensor.event.MystiaCensorChatEvent;
 import net.mystia.mystiacensor.functions.MystiaCensorExternalFunctions;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -194,11 +193,15 @@ public class MystiaCensorAPI
 				else
 				{
 					toPlayer.sendMessage(parseMessage(formatTags,originalMessage));
+					//toPlayer.sendMessage(parseMessage(MystiaCensorIntegrateFactions.parseFactionsChatString(formatTags, fromPlayer, toPlayer),originalMessage));
 				}
 			}
 		}else{
 			return;
 		}
+		
+		
+	
 	}
 	
 	

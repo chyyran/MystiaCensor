@@ -5,7 +5,7 @@ import org.bukkit.Bukkit;
 public class MystiaCensorIntegrateFunctions
 {
 
-	public boolean isUsingMcMMO()
+	public static boolean isUsingMcMMO()
 	{
 		if (Bukkit.getServer().getPluginManager().getPlugin("mcMMO") != null)
 		{
@@ -17,7 +17,7 @@ public class MystiaCensorIntegrateFunctions
 		}
 	}
 
-	public boolean isUsingFactions()
+	public static boolean isUsingFactions()
 	{
 		if (Bukkit.getServer().getPluginManager().getPlugin("Factions") != null)
 		{
